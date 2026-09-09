@@ -1008,7 +1008,8 @@ function getImageDimensions(
 }
 
 async function imageUrlToDataUrl(
-  imageUrl
+  imageUrl,
+  env
 ) {
 
   console.error(
@@ -1057,6 +1058,23 @@ async function imageUrlToDataUrl(
 
   const buffer =
     await response.arrayBuffer();
+
+  const maxSize =
+    Number(
+      env.VISION_MAX_IMAGE_SIZE ||
+      10485760
+    );
+
+  if (
+    buffer.byteLength >
+    maxSize
+  ) {
+
+    throw new Error(
+      `Image too large (${buffer.byteLength} bytes)`
+    );
+
+  }
 
   console.error(
     "VISION_IMAGE_SIZE=" +
@@ -1128,13 +1146,16 @@ async function vision(
     await request.json();
 
   const model =
-    body.model;
+    body.model ||
+    env.VISION_MODEL ||
+    "@cf/qwen/qwen3.8-27b";
 
   const imageUrl =
     body.image_url;
 
   const prompt =
     body.prompt ||
+    env.VISION_PROMPT ||
     "详细描述图片中的内容，并识别其中所有文字";
 
   if (!model) {
@@ -1142,7 +1163,7 @@ async function vision(
     return json(
       {
         error:
-          "model required"
+          "No vision model configured"
       },
       400
     );
@@ -1194,11 +1215,12 @@ async function vision(
 
   const image =
     await imageUrlToDataUrl(
-      imageUrl
+      imageUrl,
+      env
     );
 
   // =====================
-  // Vision Run
+  // Vision Inference
   // =====================
 
   const result =
@@ -1211,8 +1233,7 @@ async function vision(
 
             content: [
               {
-                type:
-                  "text",
+                type: "text",
 
                 text:
                   prompt
