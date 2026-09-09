@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Node
+node_modules/
+
+# Logs
+*.log
+
+# Wrangler
+.wrangler/
+
+# Environment
+.env
+.env.*
+
+# Temporary
+tmp/
+temp/
+
+# IDE
+.vscode/
+.idea/
