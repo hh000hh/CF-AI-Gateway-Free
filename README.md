@@ -25,6 +25,8 @@ Supports:
 
 ✅ Vision / OCR
 
+✅ OCR & Document Understanding
+
 ✅ Image Generation
 
 ✅ Embeddings
@@ -32,6 +34,10 @@ Supports:
 ✅ Signed URL Image Support
 
 ✅ R2 Image Support
+
+✅ Automatic Image Download
+
+✅ Automatic Data URL Conversion
 
 ✅ Free Tier Friendly
 
@@ -101,8 +107,6 @@ Example:
 }
 ```
 
----
-
 ### Streaming
 
 ```json
@@ -128,23 +132,55 @@ Analyze images using Cloudflare vision-capable models.
 POST /v1/vision
 ```
 
-Example:
+### Features
+
+- OCR
+- Image Understanding
+- External Image URLs
+- Signed URL Images
+- R2 Images
+- Automatic Image Download
+- Automatic Data URL Conversion
+- Image Metadata Extraction
+
+### Example
 
 ```json
 {
-  "model": "@cf/qwen/qwen3.8-27b",
-  "image_url": "https://example.com/test.png",
-  "prompt": "Describe this image and extract all text"
+  "image_url": "https://example.com/test.png"
 }
 ```
 
-Response:
+Or:
 
 ```json
 {
+  "image_url": "https://img.example.com/Test.png?expires=xxx&sign=xxx",
+  "prompt": "Extract all text from the image"
+}
+```
+
+### Sample Response
+
+```json
+{
+  "id": "vision-xxxx",
+  "object": "vision.completion",
+  "model": "@cf/qwen/qwen3.8-27b",
+
+  "image_url": "https://img.example.com/Test.png?...",
+
+  "content_type": "image/png",
+
   "image_width": 643,
   "image_height": 382,
-  "content_type": "image/png",
+
+  "image_size_bytes": 186936,
+  "image_size_kb": 182.55,
+  "image_size_mb": 0.18,
+
+  "base64_length": 249248,
+
   "choices": [
     {
       "message": {
@@ -154,6 +190,34 @@ Response:
   ]
 }
 ```
+
+### Current OCR Model
+
+Default OCR model:
+
+```text
+@cf/qwen/qwen3.8-27b
+```
+
+Verified capabilities:
+
+- OCR
+- Card Recognition
+- Document Analysis
+- Chinese Text Extraction
+- Structured Text Recognition
+
+### Image Metadata
+
+The Vision API automatically returns:
+
+- image_width
+- image_height
+- image_size_bytes
+- image_size_kb
+- image_size_mb
+- base64_length
+- content_type
 
 ---
 
@@ -193,7 +257,7 @@ Example:
 
 # Vision Models
 
-Automatically discovered from Cloudflare Models Catalog.
+Vision-capable models are automatically discovered from the Cloudflare Models Catalog.
 
 Examples:
 
@@ -203,6 +267,7 @@ Examples:
 @cf/moonshotai/kimi-k2.7-code
 @cf/meta/llama-4-scout-17b-16e-instruct
 @cf/meta/llama-3.2-11b-vision-instruct
+@cf/zai-org/glm-5.3-flash
 ```
 
 ---
@@ -229,15 +294,33 @@ CF_ACCOUNT_ID
 
 ## Optional
 
+### Vision
+
 ```text
+VISION_MODEL
 VISION_PROMPT
+VISION_MAX_IMAGE_SIZE
 ```
 
-Default:
+Default Vision Model:
+
+```text
+@cf/qwen/qwen3.8-27b
+```
+
+Default Prompt:
 
 ```text
 详细描述图片，识别文字，识别图表内容
 ```
+
+Default Max Image Size:
+
+```text
+10485760
+```
+
+(10 MB)
 
 ---
 
@@ -274,11 +357,11 @@ Client
    │
    ▼
 
-CF AI Gateway
+CF AI Gateway Free
 
    ├── Models Catalog
    ├── Chat
-   ├── Vision
+   ├── Vision / OCR
    ├── Embeddings
    └── Images
 
@@ -286,6 +369,17 @@ CF AI Gateway
            ▼
 
 Cloudflare Workers AI
+```
+
+---
+
+# Related Projects
+
+```text
+CF-AI-Gateway-Free
+CF-AI-Model-Router
+CF-Image-Proxy
+CF-Image-Sign
 ```
 
 ---
